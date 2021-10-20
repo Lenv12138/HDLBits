@@ -1,11 +1,45 @@
-module vector_test_top();
+module top_module (
+    input clk,
+    input areset,
+    input x,
+    output z
+); 
 
-wire [2:0] packed_wire = 3'b0; // 隐含了一句assign packed_wire = 3'b0;
-reg a[7:0] = 8'h01;     // packed类型(常量,位拼接符)不能复制给unpacked类型
+    parameter A = 2'd0, B = 2'd1, C = 2'd2;
 
-always @(*)
-begin
-    a = packed_wire;
-end
+    reg [2:0] state;
+    wire [2:0] next_state;
+
+    always @(posedge clk, posedge areset) begin
+        if (areset)
+            state <= 3'd0;
+        else
+            state <= next_state;
+    end
+    
+
+    always @(*)
+    begin
+        case (state)
+            A : 
+                if (x)
+                    next_state = B;
+                else
+                    next_state = A;
+            B : 
+                if (x)
+                    next_state = C;
+                else
+                    next_state = B;
+            C : 
+                if (x)
+                    next_state = C;
+                else
+                    next_state = B;
+            default : next_state = A;
+        endcase
+    end
+
+    assign z = (state == B);
 
 endmodule
